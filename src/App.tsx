@@ -24,23 +24,32 @@ import {
 
 export default function App() {
   const { currentAudit, activeTab, setTab, loadSavedSessions, resumeSession } = useAuditStore();
-  const [resumePromptOpen, setResumePromptOpen] = useState(false);
-  const [lastSessionId, setLastSessionId] = useState<string | null>(null);
+  const [restoredBanner, setRestoredBanner] = useState(false);
+  const [appReady, setAppReady] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const initApp = async () => {
       await loadSavedSessions();
-      
-      // Check for last active session
+
+      // Silently auto-restore the last active session on page load
       const savedId = localStorage.getItem('last_active_session_id');
       if (savedId) {
-        setLastSessionId(savedId);
-        setResumePromptOpen(true);
+        await resumeSession(savedId);
+        // If resume failed (session deleted/missing), clear the stale key
+        const restoredMeta = useAuditStore.getState().currentAudit.metadata;
+        if (restoredMeta) {
+          setRestoredBanner(true);
+          setTimeout(() => setRestoredBanner(false), 4000);
+        } else {
+          localStorage.removeItem('last_active_session_id');
+        }
       }
+
+      setAppReady(true);
     };
     initApp();
-  }, [loadSavedSessions]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Set last active session ID whenever current audit metadata changes
   useEffect(() => {
@@ -51,21 +60,20 @@ export default function App() {
     }
   }, [currentAudit.metadata]);
 
-  const handleResumeLast = async () => {
-    if (lastSessionId) {
-      await resumeSession(lastSessionId);
-    }
-    setResumePromptOpen(false);
-  };
-
-  const handleDeclineResume = () => {
-    localStorage.removeItem('last_active_session_id');
-    setResumePromptOpen(false);
-  };
 
   const metadata = currentAudit.metadata;
   const items = currentAudit.items;
   const hasItems = items && items.length > 0;
+
+  // Show a minimal loading screen while hydrating from IndexedDB
+  if (!appReady) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-slate-950 text-slate-300 flex-col gap-4">
+        <div className="text-4xl animate-spin-slow">📊</div>
+        <p className="text-sm font-semibold tracking-wide text-slate-400">Restoring session…</p>
+      </div>
+    );
+  }
 
   const stepsList = [
     { id: 'new-audit', label: '1. Initialize Session', enabled: !metadata },
@@ -258,37 +266,17 @@ export default function App() {
         </main>
       </div>
 
-      {/* Resume Session Modal */}
-      {resumePromptOpen && lastSessionId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-fade-in">
-          <div className="bg-slate-800 border border-slate-700 w-full max-w-md rounded-xl p-6 shadow-2xl space-y-5">
-            <div className="flex items-start gap-3">
-              <div className="p-2.5 bg-teal-600/10 text-teal-450 rounded-lg shrink-0">
-                <FolderSync className="w-6 h-6" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-lg font-bold text-slate-100">Previous Session Found</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  An unfinished stock audit verification session was detected on this device. Would you like to resume?
-                </p>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 pt-3 border-t border-slate-700">
-              <button
-                onClick={handleDeclineResume}
-                className="px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:bg-slate-700 hover:text-white transition-colors"
-              >
-                Start New Audit
-              </button>
-              <button
-                onClick={handleResumeLast}
-                className="px-4 py-2 bg-teal-650 hover:bg-teal-555 text-white rounded-lg text-xs font-semibold transition-colors shadow-lg shadow-teal-500/20"
-              >
-                Resume Session
-              </button>
-            </div>
-          </div>
+      {/* Session Restored Banner - non-blocking, auto-dismisses */}
+      {restoredBanner && (
+        <div className="fixed top-4 right-4 z-50 flex items-center gap-3 bg-slate-800 border border-teal-500/40 text-teal-300 text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl shadow-black/40 animate-fade-in">
+          <FolderSync className="w-4 h-4 shrink-0 text-teal-400" />
+          <span>Session restored — continuing where you left off.</span>
+          <button
+            onClick={() => setRestoredBanner(false)}
+            className="ml-1 text-slate-400 hover:text-white transition-colors"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
     </div>

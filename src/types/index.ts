@@ -11,6 +11,7 @@ export interface AuditSessionMetadata {
   createdAt: number;
   updatedAt: number;
   samplingMethod?: 'items' | 'value' | 'quantity';
+  lastActiveTab?: string; // Persisted navigation tab for session restore
 }
 
 export interface CountEntry {

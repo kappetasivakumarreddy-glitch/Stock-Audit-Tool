@@ -75,7 +75,16 @@ export const useAuditStore = create<AuditState>((set, get) => ({
   loading: false,
   activeTab: 'dashboard',
 
-  setTab: (tab) => set({ activeTab: tab }),
+  setTab: (tab) => {
+    set({ activeTab: tab });
+    // Persist the active tab into the session metadata so it survives a refresh
+    const { metadata, items } = get().currentAudit;
+    if (metadata) {
+      const updatedMetadata = { ...metadata, lastActiveTab: tab };
+      set({ currentAudit: { metadata: updatedMetadata, items } });
+      syncToDb(updatedMetadata, items);
+    }
+  },
 
   loadSavedSessions: async () => {
     set({ loading: true });
@@ -133,9 +142,10 @@ export const useAuditStore = create<AuditState>((set, get) => ({
     try {
       const session = await indexedDbService.getSession(id);
       if (session) {
+        const restoredTab = (session.metadata.lastActiveTab as AuditState['activeTab']) || 'dashboard';
         set({
           currentAudit: session,
-          activeTab: 'dashboard',
+          activeTab: restoredTab,
         });
       }
     } catch (err) {
