@@ -1,0 +1,143 @@
+@import "tailwindcss";
+
+@theme {
+  /* User-Defined Custom Palette Mappings */
+  --color-border: #E5DCCB;
+  --color-input: #E5DCCB;
+  --color-ring: #8B5E34;
+  --color-background: #F6F1E3;
+  --color-foreground: #4B5563;
+  
+  --color-primary: #8B5E34;
+  --color-primary-foreground: #F6F1E3;
+  
+  --color-secondary: #2F3E46;
+  --color-secondary-foreground: #FAF7EE;
+  
+  --color-muted: #E5DCCB;
+  --color-muted-foreground: #6B7280;
+  
+  --color-accent: #8B5E34;
+  --color-accent-foreground: #F6F1E3;
+  
+  --color-destructive: #991B1B; /* dark red for light background */
+  --color-destructive-foreground: #ffffff;
+
+  --color-success: #166534; /* dark green for light background */
+  --color-warning: #9A3412; /* dark amber for light background */
+
+  /* Map standard utility colors to our beautiful light theme palette */
+  --color-slate-955: #EFEAE0;
+  --color-slate-950: #F6F1E3; /* Background */
+  --color-slate-900: #FAF7EE; /* Cards / Panels */
+  --color-slate-850: #EFEAE0;
+  --color-slate-800: #EFEAE0; /* Header blocks */
+  --color-slate-755: #E5DCCB;
+  --color-slate-750: #E5DCCB;
+  --color-slate-700: #E5DCCB; /* Borders */
+  --color-slate-650: #D8CFBC;
+  --color-slate-600: #D8CFBC;
+  --color-slate-500: #9CA3AF;
+  
+  /* Text mappings */
+  --color-slate-100: #1F2933; /* Main Titles (Dark slate) */
+  --color-slate-200: #1F2933; /* Headings */
+  --color-slate-300: #2F3E46; /* Subheadings (slate-green) */
+  --color-slate-350: #4B5563; /* Content / Body */
+  --color-slate-355: #4B5563;
+  --color-slate-400: #4B5563;
+  --color-slate-450: #6B7280;
+  
+  /* Teal references mapped to accent gold/brown */
+  --color-teal-950: #FAF7EE;
+  --color-teal-650: #8B5E34;
+  --color-teal-600: #8B5E34;
+  --color-teal-555: #8B5E34;
+  --color-teal-500: #8B5E34;
+  --color-teal-450: #8B5E34;
+  --color-teal-400: #8B5E34;
+}
+
+:root {
+  --background: 246, 241, 227; /* #F6F1E3 */
+  --foreground: 75, 85, 99; /* #4B5563 */
+  
+  --card: 250, 247, 238; /* #FAF7EE */
+  --card-foreground: 31, 41, 51;
+  
+  --popover: 250, 247, 238;
+  --popover-foreground: 31, 41, 51;
+  
+  --primary: 139, 94, 52; /* #8B5E34 */
+  --primary-foreground: 246, 241, 227;
+  
+  --secondary: 47, 62, 70; /* #2F3E46 */
+  --secondary-foreground: 246, 241, 227;
+  
+  --muted: 229, 220, 203; /* #E5DCCB */
+  --muted-foreground: 107, 114, 128;
+  
+  --accent: 139, 94, 52;
+  --accent-foreground: 246, 241, 227;
+  
+  --destructive: 153, 27, 27;
+  --destructive-foreground: 255, 255, 255;
+
+  --success: 22, 101, 52;
+  --warning: 154, 52, 18;
+  
+  --border: 229, 220, 203; /* #E5DCCB */
+  --input: 229, 220, 203;
+  --ring: 139, 94, 52;
+  
+  --radius: 0.5rem;
+}
+
+/* Set border colors globally */
+* {
+  border-color: #E5DCCB;
+}
+
+body {
+  background-color: #F6F1E3;
+  color: #4B5563;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Custom Scrollbar Styles for Professional UI */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #F6F1E3;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #E5DCCB;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #D8CFBC;
+}
+
+/* Smooth fade-in utility */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+/* Chrome-like table header styles */
+.sticky-table-header th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #EFEAE0;
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+}
